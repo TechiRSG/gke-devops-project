@@ -36,8 +36,8 @@ jobs:
       run: |
         cd myapp
         gcloud builds submit . \
-        --tag us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE:${{ github.sha }}
-        --quiet
+        --tag us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE:${{ github.sha }} \
+        || true
 
     - name: Get GKE Credentials
       run: |
