@@ -1,0 +1,48 @@
+name: GKE Deploy Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: devops-gke-project-12345
+  CLUSTER_NAME: my-gke-cluster
+  REGION: us-central1
+  REPO_NAME: my-repo
+  IMAGE: myapp
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker Auth
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Build Image (Cloud Build)
+      run: |
+        gcloud builds submit \
+        --tag us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE:${{ github.sha }}
+
+    - name: Get GKE Credentials
+      run: |
+        gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION
+
+    - name: Deploy using Helm
+      run: |
+        helm upgrade --install myapp ./myapp \
+        --set image.repository=us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE \
+        --set image.tag=${{ github.sha }}
