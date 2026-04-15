@@ -35,7 +35,7 @@ jobs:
     - name: Build Image (Cloud Build)
       run: |
         cd myapp
-        gcloud builds submit \
+        gcloud builds submit . \
         --tag us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE:${{ github.sha }}
         --async
 
