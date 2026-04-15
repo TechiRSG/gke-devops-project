@@ -38,6 +38,17 @@ jobs:
         gcloud builds submit . \
         --tag us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE:${{ github.sha }} \
         || true
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Install GKE Auth Plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin --quiet    
 
     - name: Get GKE Credentials
       run: |
