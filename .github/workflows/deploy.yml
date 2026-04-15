@@ -56,6 +56,6 @@ jobs:
 
     - name: Deploy using Helm
       run: |
-        helm upgrade --install myapp ./myapp \
+        helm upgrade --install myapp ./myapp/myapp \
         --set image.repository=us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$IMAGE \
         --set image.tag=${{ github.sha }}
